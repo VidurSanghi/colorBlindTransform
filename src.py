@@ -3,23 +3,17 @@ import math
 import copy
 
 def onAppStart(app):
-    #all images and data from colormax.org
+    #all test images and data from colormax.org
 
     app.testImage ='test2.png'
 
-    app.correctAnswers = [7, 6, 26,15,6,73,5,16,45,12,29,8]
-    app.alternateAnswers = [
-    (0,), (0,), (6, 2), (17,), (0,), (0,), (0,), (0,), (0,), (0,), (70,), (3, 0)
-    ]
+    app.correctAnswers = [7, 6, 26, 15, 6, 73, 5, 16, 45, 12, 29, 8]
     app.tempMeaning = [
-    ("colorblind",), ("colorblind",), ("red-green",), ("colorblind",), 
-    ("colorblind",), ("colorblind",), ("colorblind",), ("colorblind",), 
-    ("colorblind",), ("red-green",), ("red-green",)
-    ]
-    app.answerMeaning = [
-    (None,), (None,), ("red", "green"), ("red-green",), (None,), (None,), 
-    (None,), (None,), (None,), (None,), ("red-green",), ("red-green",)
-    ]
+    "colorblind", "colorblind", "red-green", "colorblind", 
+    "colorblind", "colorblind", "colorblind", "colorblind", 
+    "colorblind", "red-green", "red-green", "red-green"
+]
+
 
     app.d = {"colorblind": 0, "red-green":0}
     app.expr = ""
@@ -29,19 +23,23 @@ def onAppStart(app):
     app.redY = 350
     app.greenY = 500
     app.blueY = 650
+    app.thresholdY = 800
     app.blueCircle = False
     app.redCircle = False
     app.greenCircle = False
+    app.threshold = False
     app.radius = 10
-    app.lineMin = 10
-    app.lineMax = 265
+    app.lineMin = 50
+    app.lineMax = 305
     app.changeRed = 0
     app.changeGreen = 0 
     app.changeBlue = 0
+    app.changeThreshold = 0
     app.center = (app.lineMin+app.lineMax)//2
     app.redX = app.center
     app.greenX = app.center
     app.blueX = app.center
+    app.thresholdX = app.center
     app.p1x = 0
     app.p1y = 0
     app.p2x = 0
@@ -59,12 +57,23 @@ def onAppStart(app):
     app.border = []
     app.originalRgb = []
     
-    app.startX, app.startY = 300, 50
+    app.startX, app.startY = 500, 50
     n = 10000000000000000 
     app.setMaxShapeCount(n)
 
+def start_redrawAll(app):
+    drawRect(0, 0, 2000, 2000, fill=rgb(41,189,193))
+    drawLabel("Colorblind Transformation", app.width/2, app.height/2-300, size = 80)
+    drawLabel("The purpose of this tool is to help colorblind people distinguish objects in images that can be difficult to see", app.width/2, app.height/2-20, size = 30)
+    drawLabel("This project focuses on red-green (Deuteranomaly) and blue-yellow (Tritanomaly) colorblindness, and starts with a short assesment", app.width/2, app.height/2+30, size = 20)
+    drawLabel("Please click enter (return) to begin the assesment", app.width/2, app.height/2+60, size = 18)
+
+def start_onKeyPress(app, key):
+    if key == "enter":
+        setActiveScreen("test")
+
 def test_redrawAll(app):
-    if(app.countAnswered<=12):
+    if(app.countAnswered<13):
         drawImage(app.testImage, 0,0)
         
         drawLabel(f"Type in the number you see in circle {app.countAnswered}", 1200, 50, size = 20)
@@ -81,14 +90,7 @@ def test_onKeyPress(app, key):
     elif(key=='backspace' and app.expr!=""):
         app.expr = app.expr[0:len(app.expr)-1]
     #this next line is here temporarily because i do not know how to access app from main
-    if app.countAnswered >=12:
-        generalColorBlindness, redGreen = checkResults(app)
-        if redGreen > 0 and generalColorBlindness>0:
-            app.colorBlindnessType = "both"
-        elif redGreen == 0 and generalColorBlindness>0:
-            app.colorBlindnessType = "blue-yellow"
-        elif redGreen >0 and generalColorBlindness==0:
-            app.colorBlindnessType = "red-green"
+    if app.countAnswered >12:
         setActiveScreen("results")
 
 
@@ -102,12 +104,11 @@ def checkResults(app):
         if int(app.guesses[i]) == app.correctAnswers[i]:
             continue
         else:
-            for j in range(len(app.alternateAnswers[i])):
-                if int(app.guesses[i]) == app.alternateAnswers[i][j]:
-                    app.d[app.tempMeaning[i][0]] = app.d.get(app.tempMeaning[i][0],0)+1
+            app.d[app.tempMeaning[i]] +=1
     return app.d["colorblind"], app.d["red-green"]
 
 def results_redrawAll(app):
+    drawRect(0, 0, 2000, 2000, fill=rgb(41,189,193))
     generalColorBlindness, redGreen = checkResults(app)
     if redGreen > 0 and generalColorBlindness>0:
         drawLabel("You have red-green and blue-yellow colorblindness", app.width/2, app.height/2, size = 40)
@@ -127,7 +128,7 @@ def results_onKeyPress(app, key):
     
     if(key=='backspace' and app.expr!=""):
         app.expr = app.expr[0:len(app.expr)-1]
-    elif key == 'enter':
+    elif key == 'enter' and app.expr!="" and app.expr!= " ":
         app.filePath = app.expr
         with open(app.filePath, "r") as f:
             for line in f:
@@ -136,7 +137,7 @@ def results_onKeyPress(app, key):
         app.enhanced = enhanceForColorblindness(app)
         app.border = findHueBorder(app.originalRgb, 30)
         setActiveScreen('transformedImageWithSliders')
-    elif key!=" ":
+    elif key!=" " and key!= "backspace" and key!="enter":
         app.expr+=key
 
 
@@ -147,6 +148,14 @@ def transformedImageWithSliders_redrawAll(app):
     drawCircle(app.greenX, app.greenY,  app.radius, fill = 'green')
     drawLine(app.lineMin,app.redY, app.lineMax, app.redY)
     drawCircle(app.redX, app.redY,  app.radius, fill = 'red')
+    drawLine(app.lineMin,app.thresholdY, app.lineMax, app.thresholdY)
+    drawCircle(app.thresholdX, app.thresholdY,  app.radius, fill = 'black')
+
+    drawLabel("Use the sliders below ", app.center, 70, size=25)
+    drawLabel("to adjust red, green,", app.center, 100, size=25)
+    drawLabel("blue, and the black slider", app.center, 130, size=25)
+    drawLabel("for the border", app.center, 160, size=25)
+    drawLabel("Click enter to try another image",app.center, 180, size=15)
 
     x = app.startX
     y = app.startY
@@ -192,12 +201,20 @@ def transformedImageWithSliders_onMousePress(app, mouseX, mouseY):
         app.blueCircle = not app.blueCircle
         app.redCircle = False
         app.greenCircle = False
+        app.threshold = False
     elif distance(mouseX, app.greenX, mouseY, app.greenY)< app.radius:
         app.greenCircle = not app.greenCircle
         app.redCircle = False
         app.blueCircle = False
+        app.threshold = False
     elif distance(mouseX, app.redX, mouseY, app.redY)< app.radius:
         app.redCircle = not app.redCircle
+        app.blueCircle = False
+        app.greenCircle = False
+        app.threshold = False
+    elif distance(mouseX, app.thresholdX, mouseY, app.thresholdY)<app.radius:
+        app.threshold = not app.threshold
+        app.redCircle = False
         app.blueCircle = False
         app.greenCircle = False
     
@@ -228,6 +245,23 @@ def transformedImageWithSliders_onMouseMove(app, mouseX, mouseY):
         else:
             app.redX = mouseX
         app.changeRed = (app.redX - app.center)*2
+    if app.threshold:
+        if mouseX>app.lineMax:
+            app.thresholdX = app.lineMax
+        elif mouseX<app.lineMin:
+            app.thresholdX = app.lineMin
+        else:
+            app.thresholdX = mouseX
+        app.changeThreshold = (app.thresholdX - app.center)
+        #the following line of code ensures that the threshold is between 0 and 360 which are the min and max values that hue can reach.
+        threshold = max(0, min(360, 30 + app.changeThreshold))
+        app.border = findHueBorder(app.originalRgb, threshold)
+
+def transformedImageWithSliders_onKeyPress(app, key):
+    if key == "enter":
+        setActiveScreen('results')
+
+
 
 
 def distance(x1,x2, y1, y2):
@@ -383,7 +417,7 @@ def findHueBorder(rgbArray, hueThreshold):
 
 
 def main():
-    runAppWithScreens(initialScreen='test')
+    runAppWithScreens(initialScreen='start')
 
    
 main()
