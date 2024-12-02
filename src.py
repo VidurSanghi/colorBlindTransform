@@ -111,18 +111,18 @@ def results_redrawAll(app):
     drawRect(0, 0, 2000, 2000, fill=rgb(41,189,193))
     generalColorBlindness, redGreen = checkResults(app)
     if redGreen > 0 and generalColorBlindness>0:
-        drawLabel("You have red-green and blue-yellow colorblindness", app.width/2, app.height/2, size = 40)
+        drawLabel("You have red-green and blue-yellow colorblindness", app.width/2, app.height/2-100, size = 50)
     elif redGreen == 0 and generalColorBlindness>0:
-        drawLabel("You have blue-yellow colorblindness", app.width/2, app.height/2, size = 40)
+        drawLabel("You have blue-yellow colorblindness", app.width/2, app.height/2-100, size = 50)
     elif redGreen >0 and generalColorBlindness==0:
-        drawLabel("You have red-green colorblindness", app.width/2, app.height/2, size = 40)
+        drawLabel("You have red-green colorblindness", app.width/2, app.height/2-100, size = 50)
     else:
         drawLabel("You are not colorblind, but feel free to proceed to see the transformations", app.width/2, app.height/2, size = 40)
 
-    drawLabel("Enter the path below", app.width/2, app.height/2+40, size = 15)
-    drawLabel(str(app.expr),app.width/2, app.height/2+60, size = 15)
+    drawLabel("Enter the path below", app.width/2, app.height/2-35, size = 20)
+    drawLabel(str(app.expr),app.width/2, app.height/2-5, size = 20)
 
-    drawLabel("Click enter to continue", app.width/2, app.height/2+80, size = 20)
+    drawLabel("Click enter to continue", app.width/2, app.height/2+25, size = 20)
 
 def results_onKeyPress(app, key):
     
@@ -261,9 +261,6 @@ def transformedImageWithSliders_onKeyPress(app, key):
     if key == "enter":
         setActiveScreen('results')
 
-
-
-
 def distance(x1,x2, y1, y2):
     return ((x1-x2)**2+(y1-y2)**2)**0.5
 
@@ -371,7 +368,7 @@ def detectBorder(app):
 The idea for the following recursive approach came from a conversation with my TP Mentor, Angie Chi (achi2), who shared that I could explore a flood fill algorithm to detect borders
 I did some more research and brainstorming on ways to do border detection recursively and found the DFS algorithm, which is much like backtracking, but has no condition in which it terminates, because there is no condition under which it terminates.
 This algorithm made sense in this use case, since there is no standard case in which the algorithm should terminate.
-I used the following source to develop a better understanding: https://www.geeksforgeeks.org/difference-between-bfs-and-dfs/
+I used the following source to develop a better understanding: https://www.geeksforgeeks.org/difference-between-bfs-and-dfs/ and https://www.geeksforgeeks.org/depth-first-search-or-dfs-for-a-graph/ 
 The implementation below is entirely my own as can be see by the clear backtracking approach I have applied as taught during 112 lectures in class
 The increeased efficiency below is highlighted further, but generally, the following algorithm finds pixels that are considered "borders" based on a moveable threshold,
 and then searchers the neighbors. This is more efficient than just going through every pixel and checking all 8 of its neighbors, since going from one pixel to another recursively does not required us to check
@@ -395,13 +392,13 @@ def findHueBorder(rgbArray, hueThreshold):
     #the following function goes determines whether a startpoint is a border, and then goes down the tree to determine if the border continues. This is most efficient, because it is likely that one border pixel has other border pixels around it
     def backtrack(row, col):
         seen[row][col] = True
-        hue, x, y = hsvArray[row][col]
+        hue = hsvArray[row][col][0]
         
         borderPixel = False
         for nextR, nextC in directions:
             currR, currC = row + nextR, col + nextC
             if 0 <= currR < rows and 0 <= currC < cols and not seen[currR][currC]:
-                newHue, p, q = hsvArray[currR][currC]
+                newHue = hsvArray[currR][currC][0]
                 if isBorder(hue, newHue):
                     borderPixel = True
                     backtrack(currR, currC)
