@@ -18,5 +18,7 @@ Please also note you must have the "test2.png" image in the same folder as the s
 
 When you feed in a file path for the program to transform, if you have a file in the same folder as the source code, you can just use its name, but if not, you may need to copy the entire path. 
 
+I have included the trial image I used in my video so that a user may use it as a sample as well.
+
 Shortcut Commands
 There are no shortcut commands, the code can simply be run once the libraries mentioned above are downloaded and configured properly
