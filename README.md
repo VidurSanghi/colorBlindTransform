@@ -4,7 +4,7 @@ colorBlindTransform
 Color Blind Transform Project
 
 Description:
-This project aims to create a tool that will ingest an image and transform it so that it appears clear to a color-blind person. Specifically, this tool will start by giving users an assessment that will evaluate what kinds of color blindness they have, so that the application only transforms colors that users have trouble seeing. After the evaluation, the application will generate a scale on which it will transform the colors of images, and then apply that scale to an image to change the color.
+This project aims to create a tool that will ingest an image and transform it so that it appears clear to a color-blind person. Specifically, this tool will start by giving users an assessment that will evaluate what kinds of color blindness they have, so that the application only transforms colors that users have trouble seeing. After the evaluation, the application will apply 3 algorithms that the user can adjust to enhance the image for the user.
 
 
 As someone who is colorblind, I have experienced some of the troubles, although small, and a tool like this would be interesting to implement. I think an actual implementation could be a collaboration with a company like Meta on their Orion glasses, which have a built-in screen and camera pointing outwards. The built-in screen could transform colors specific to users and their relative view of colors so that they could see colors the same way as people who are not color blind.  
