@@ -424,7 +424,7 @@ def distance(x1,x2, y1, y2):
 """
 The idea to use the following transformation scheme of hsv came from a conversation with my father, Vivek Sanghi, who was aware that I was working on this project.
 
-We initially thought it would be a good idea to do edge detection, for which I have left in commented code. The initial idea was to try and detect when there were severe changes in intensity of colors or in rgb values and outline those areas, however, this was not sufficient.
+We initially thought it would be a good idea to do edge detection. The initial idea was to try and detect when there were severe changes in intensity of colors or in rgb values and outline those areas, which has been implemented entirely by my own work.
 Further reserach led to HSV and RGB transformation which explored using few key sources:
 
 1. This source discusses how HSV is used to depict the way humans percieve combinations of colors, rather than rgb which focuses more on individual colors. It also includes information on which hues map to which colors which is essential for the enhance colors function: https://www.lifewire.com/what-is-hsv-in-design-1078068
